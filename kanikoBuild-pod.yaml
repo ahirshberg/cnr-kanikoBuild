@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: builder2000
+  name: builder2000
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    args: ["--dockerfile=/workspace/Dockerfile",
+    #       "--context=dir://workspace",
+           "--context=git://gitlab.com/Hirshberg/goplay.git",
+           "--destination=docker.io/cics89/hirshcorp:latest",
+           "--skip-tls-verify"] 
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /root/.docker/
+      - name: shared-space
+        mountPath: /workspace
+    resources: {}
+ # initContainers:
+ # - name: goget
+ #   image: docker.io/library/golang:1.13.5
+ #   command: ["git"]
+ #   args: ["clone","https://gitlab.com/Hirshberg/goplay.git","/tmp/workspace"]
+ #   volumeMounts:
+ #     - name: shared-space
+ #       mountPath: /tmp/workspace
+ #   resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: dockercred  #k create secret generic dockercred --from-file=config.json
+    - name: shared-space
+      emptyDir: {}
