@@ -1,0 +1,33 @@
+pipeline {
+  agent {
+    kubernetes {
+      //cloud 'kubernetes'
+      defaultContainer 'kaniko'
+      yaml """
+kind: Pod
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /root/.docker/
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: dockercred
+"""
+    }
+  }
+  stages {
+    stage('Build with Kaniko') {
+      steps {
+        sh '/kaniko/executor --dockerfile=/workspace/Dockerfile --context=git://gitlab.com/Hirshberg/goplay.git --destination=docker.io/cics89/hirshcorp:latest --skip-tls-verify'
+      }
+    }
+  }
+}
