@@ -8,9 +8,7 @@ spec:
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
-    args: ["--context=git://gitlab.com/Hirshberg/goplay.git",
-           "--destination=docker.io/cics89/hirshcorp:latest",
-           "--skip-tls-verify"] 
+    args: ["--context=git://gitlab.com/Hirshberg/goplay.git","--destination=docker.io/cics89/hirshcorp:latest","--skip-tls-verify"] 
     volumeMounts:
       - name: docker-config
         mountPath: /root/.docker/
